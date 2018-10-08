@@ -151,7 +151,7 @@ export default class PeerView extends React.Component
 	componentWillReceiveProps(nextProps)
 	{
 		const { audioTrack, videoTrack } = nextProps;
-
+		
 		this._setTracks(audioTrack, videoTrack);
 	}
 

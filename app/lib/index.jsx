@@ -28,22 +28,9 @@ const reduxMiddlewares =
 	thunk,
 	roomClientMiddleware
 ];
-
-if (process.env.NODE_ENV === 'development')
-{
-	const reduxLogger = createReduxLogger(
-		{
-			duration  : true,
-			timestamp : false,
-			level     : 'log',
-			logErrors : true
-		});
-
-	reduxMiddlewares.push(reduxLogger);
-}
 let middleware = applyReduxMiddleware(...reduxMiddlewares);
 
-if (process.env.NODE_ENV != 'production') 
+if (process.env.NODE_ENV === 'development') 
 {
 	const devToolsExtension = window.devToolsExtension;
 	
