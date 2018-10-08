@@ -480,6 +480,7 @@ export default class RoomClient
 			});
 	}
 
+	// Setup protoo
 	_join({ displayName, device })
 	{
 		this._dispatch(stateActions.setRoomState('connecting'));
@@ -589,6 +590,7 @@ export default class RoomClient
 		});
 	}
 
+	// Setup room
 	_joinRoom({ displayName, device })
 	{
 		logger.debug('_joinRoom()');
@@ -644,6 +646,7 @@ export default class RoomClient
 		this._room.join(this._peerName, { displayName, device })
 			.then(() =>
 			{
+				// TODO: only challenger (producer) can send media
 				// Create Transport for sending.
 				this._sendTransport =
 					this._room.createTransport('send', { media: 'SEND_MIC_WEBCAM' });
@@ -675,6 +678,7 @@ export default class RoomClient
 			})
 			.then(() =>
 			{
+				// TODO: if current user is not challenger => this._produce = false;
 				// Don't produce if explicitely requested to not to do it.
 				if (!this._produce)
 					return;

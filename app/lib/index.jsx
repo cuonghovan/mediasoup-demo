@@ -5,7 +5,8 @@ import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import {
 	applyMiddleware as applyReduxMiddleware,
-	createStore as createReduxStore
+	createStore as createReduxStore,
+	compose
 } from 'redux';
 import thunk from 'redux-thunk';
 import { createLogger as createReduxLogger } from 'redux-logger';
@@ -40,11 +41,22 @@ if (process.env.NODE_ENV === 'development')
 
 	reduxMiddlewares.push(reduxLogger);
 }
+let middleware = applyReduxMiddleware(...reduxMiddlewares);
+
+if (process.env.NODE_ENV != 'production') 
+{
+	const devToolsExtension = window.devToolsExtension;
+	
+	if (typeof devToolsExtension === 'function') 
+	{
+		middleware = compose(middleware, devToolsExtension());
+	}
+}
 
 const store = createReduxStore(
 	reducers,
 	undefined,
-	applyReduxMiddleware(...reduxMiddlewares)
+	middleware
 );
 
 domready(() =>
@@ -63,8 +75,8 @@ function run()
 	const peerName = randomString({ length: 8 }).toLowerCase();
 	const urlParser = new UrlParse(window.location.href, true);
 	let roomId = urlParser.query.roomId;
-	const produce = urlParser.query.produce !== 'false';
 	let displayName = urlParser.query.displayName;
+	const produce = urlParser.query.produce !== 'false';
 	const isSipEndpoint = urlParser.query.sipEndpoint === 'true';
 	const useSimulcast = urlParser.query.simulcast !== 'false';
 
