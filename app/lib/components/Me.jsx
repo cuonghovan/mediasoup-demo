@@ -29,7 +29,7 @@ class Me extends React.Component
 		} = this.props;
 
 		// Not a producer
-		// if (!(micProducer && webcamProducer)) return null;
+		if (!micProducer && !webcamProducer) return null;
 
 		let micState;
 
@@ -59,6 +59,7 @@ class Me extends React.Component
 
 		return (
 			<div
+				className='me'
 				data-component='Peer'
 				ref={(node) => (this._rootNode = node)}
 			>

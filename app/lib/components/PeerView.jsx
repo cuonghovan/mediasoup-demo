@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import Spinner from 'react-spinner';
 import hark from 'hark';
-import * as appPropTypes from './appPropTypes';
-import EditableInput from './EditableInput';
 
 export default class PeerView extends React.Component
 {
@@ -14,9 +12,7 @@ export default class PeerView extends React.Component
 
 		this.state =
 		{
-			volume      : 0, // Integer from 0 to 10.,
-			videoWidth  : null,
-			videoHeight : null
+			volume      : 0
 		};
 
 		// Latest received video track.
@@ -30,84 +26,22 @@ export default class PeerView extends React.Component
 		// Hark instance.
 		// @type {Object}
 		this._hark = null;
-
-		// Periodic timer for showing video resolution.
-		this._videoResolutionTimer = null;
 	}
 
 	render()
 	{
 		const {
 			isMe,
-			peer,
 			videoVisible,
-			videoProfile,
-			audioCodec,
-			videoCodec,
-			onChangeDisplayName
+			videoProfile
 		} = this.props;
 
 		const {
-			volume,
-			videoWidth,
-			videoHeight
+			volume
 		} = this.state;
 
 		return (
 			<div data-component='PeerView'>
-				<div className='info'>
-					<div className={classnames('media', { 'is-me': isMe })}>
-						<div className='box'>
-							{audioCodec ?
-								<p className='codec'>{audioCodec}</p>
-								:null
-							}
-
-							{videoCodec ?
-								<p className='codec'>{videoCodec} {videoProfile}</p>
-								:null
-							}
-
-							{(videoVisible && videoWidth !== null) ?
-								<p className='resolution'>{videoWidth}x{videoHeight}</p>
-								:null
-							}
-						</div>
-					</div>
-
-					<div className={classnames('peer', { 'is-me': isMe })}>
-						{isMe ?
-							<EditableInput
-								value={peer.displayName}
-								propName='displayName'
-								className='display-name editable'
-								classLoading='loading'
-								classInvalid='invalid'
-								shouldBlockWhileLoading
-								editProps={{
-									maxLength   : 20,
-									autoCorrect : false,
-									spellCheck  : false
-								}}
-								onChange={({ displayName }) => onChangeDisplayName(displayName)}
-							/>
-							:
-							<span className='display-name'>
-								{peer.displayName}
-							</span>
-						}
-
-						<div className='row'>
-							<span
-								className={classnames('device-icon', peer.device.flag)}
-							/>
-							<span className='device-version'>
-								{peer.device.name} {Math.floor(peer.device.version) || null}
-							</span>
-						</div>
-					</div>
-				</div>
-
 				<video
 					ref='video'
 					className={classnames({
@@ -144,8 +78,6 @@ export default class PeerView extends React.Component
 	{
 		if (this._hark)
 			this._hark.stop();
-
-		clearInterval(this._videoResolutionTimer);
 	}
 
 	componentWillReceiveProps(nextProps)
@@ -166,9 +98,6 @@ export default class PeerView extends React.Component
 		if (this._hark)
 			this._hark.stop();
 
-		clearInterval(this._videoResolutionTimer);
-		this._hideVideoResolution();
-
 		const { video } = this.refs;
 
 		if (audioTrack || videoTrack)
@@ -185,9 +114,6 @@ export default class PeerView extends React.Component
 
 			if (audioTrack)
 				this._runHark(stream);
-
-			if (videoTrack)
-				this._showVideoResolution();
 		}
 		else
 		{
@@ -219,42 +145,13 @@ export default class PeerView extends React.Component
 				this.setState({ volume: volume });
 		});
 	}
-
-	_showVideoResolution()
-	{
-		this._videoResolutionTimer = setInterval(() =>
-		{
-			const { videoWidth, videoHeight } = this.state;
-			const { video } = this.refs;
-
-			// Don't re-render if nothing changed.
-			if (video.videoWidth === videoWidth && video.videoHeight === videoHeight)
-				return;
-
-			this.setState(
-				{
-					videoWidth  : video.videoWidth,
-					videoHeight : video.videoHeight
-				});
-		}, 1000);
-	}
-
-	_hideVideoResolution()
-	{
-		this.setState({ videoWidth: null, videoHeight: null });
-	}
 }
 
 PeerView.propTypes =
 {
 	isMe : PropTypes.bool,
-	peer : PropTypes.oneOfType(
-		[ appPropTypes.Me, appPropTypes.Peer ]).isRequired,
 	audioTrack          : PropTypes.any,
 	videoTrack          : PropTypes.any,
 	videoVisible        : PropTypes.bool.isRequired,
-	videoProfile        : PropTypes.string,
-	audioCodec          : PropTypes.string,
-	videoCodec          : PropTypes.string,
-	onChangeDisplayName : PropTypes.func
+	videoProfile        : PropTypes.string
 };

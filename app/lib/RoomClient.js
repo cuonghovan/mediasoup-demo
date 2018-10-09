@@ -646,7 +646,20 @@ export default class RoomClient
 		this._room.join(this._peerName, { displayName, device })
 			.then(() =>
 			{
-				// TODO: only challenger (producer) can send media
+				// Create Transport for receiving.
+				this._recvTransport =
+				this._room.createTransport('recv', { media: 'RECV' });
+				
+				this._recvTransport.on('close', (originator) =>
+				{
+					logger.debug(
+						'receiving Transport "close" event [originator:%s]', originator);
+				});
+					
+				// Don't produce if explicitely requested to not to do it.
+				if (!this._produce)
+					return;
+					
 				// Create Transport for sending.
 				this._sendTransport =
 					this._room.createTransport('send', { media: 'SEND_MIC_WEBCAM' });
@@ -655,16 +668,6 @@ export default class RoomClient
 				{
 					logger.debug(
 						'Transport "close" event [originator:%s]', originator);
-				});
-
-				// Create Transport for receiving.
-				this._recvTransport =
-					this._room.createTransport('recv', { media: 'RECV' });
-
-				this._recvTransport.on('close', (originator) =>
-				{
-					logger.debug(
-						'receiving Transport "close" event [originator:%s]', originator);
 				});
 			})
 			.then(() =>
@@ -678,11 +681,10 @@ export default class RoomClient
 			})
 			.then(() =>
 			{
-				// TODO: if current user is not challenger => this._produce = false;
 				// Don't produce if explicitely requested to not to do it.
 				if (!this._produce)
 					return;
-
+				
 				// NOTE: Don't depend on this Promise to continue (so we don't do return).
 				Promise.resolve()
 					// Add our mic.

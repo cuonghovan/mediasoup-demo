@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import * as appPropTypes from './appPropTypes';
 import Peer from './Peer';
 import Me from './Me';
+
 const Room = ({ peers }) =>
 {
 	return (
@@ -30,8 +31,7 @@ const mapStateToProps = (state) =>
 	const peersArray = Object.values(state.peers);
 
 	return {
-		peers             : peersArray,
-		activeSpeakerName : state.room.activeSpeakerName
+		peers             : peersArray
 	};
 };
 

@@ -10,9 +10,9 @@ const Peer = (props) =>
 		micConsumer,
 		webcamConsumer
 	} = props;
-
-	// Not a producer
-	// if (!(micConsumer && webcamConsumer)) return null;
+	
+	// New peer is not a producer
+	if (!micConsumer && !webcamConsumer) return null;
 
 	const micEnabled = (
 		Boolean(micConsumer) &&
