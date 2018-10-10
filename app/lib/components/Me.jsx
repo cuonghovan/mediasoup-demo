@@ -59,7 +59,6 @@ class Me extends React.Component
 
 		return (
 			<div
-				className='me'
 				data-component='Peer'
 				ref={(node) => (this._rootNode = node)}
 			>
@@ -88,12 +87,9 @@ class Me extends React.Component
 
 				<PeerView
 					isMe
-					peer={me}
 					audioTrack={micProducer ? micProducer.track : null}
 					videoTrack={webcamProducer ? webcamProducer.track : null}
 					videoVisible={videoVisible}
-					audioCodec={micProducer ? micProducer.codec : null}
-					videoCodec={webcamProducer ? webcamProducer.codec : null}
 				/>
 			</div>
 		);
