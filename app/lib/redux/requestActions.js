@@ -17,14 +17,6 @@ export const leaveRoom = () =>
 	};
 };
 
-export const changeDisplayName = (displayName) =>
-{
-	return {
-		type    : 'CHANGE_DISPLAY_NAME',
-		payload : { displayName }
-	};
-};
-
 export const muteMic = () =>
 {
 	return {
@@ -57,27 +49,6 @@ export const changeWebcam = () =>
 {
 	return {
 		type : 'CHANGE_WEBCAM'
-	};
-};
-
-export const enableAudioOnly = () =>
-{
-	return {
-		type : 'ENABLE_AUDIO_ONLY'
-	};
-};
-
-export const disableAudioOnly = () =>
-{
-	return {
-		type : 'DISABLE_AUDIO_ONLY'
-	};
-};
-
-export const restartIce = () =>
-{
-	return {
-		type : 'RESTART_ICE'
 	};
 };
 

@@ -24,10 +24,7 @@ export const Me = PropTypes.shape(
 		canSendMic           : PropTypes.bool.isRequired,
 		canSendWebcam        : PropTypes.bool.isRequired,
 		canChangeWebcam      : PropTypes.bool.isRequired,
-		webcamInProgress     : PropTypes.bool.isRequired,
-		audioOnly            : PropTypes.bool.isRequired,
-		audioOnlyInProgress  : PropTypes.bool.isRequired,
-		restartIceInProgress : PropTypes.bool.isRequired
+		webcamInProgress     : PropTypes.bool.isRequired
 	});
 
 export const Producer = PropTypes.shape(

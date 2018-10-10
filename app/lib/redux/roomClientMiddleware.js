@@ -44,15 +44,6 @@ export default ({ dispatch, getState }) => (next) =>
 				break;
 			}
 
-			case 'CHANGE_DISPLAY_NAME':
-			{
-				const { displayName } = action.payload;
-
-				client.changeDisplayName(displayName);
-
-				break;
-			}
-
 			case 'MUTE_MIC':
 			{
 				client.muteMic();
@@ -84,27 +75,6 @@ export default ({ dispatch, getState }) => (next) =>
 			case 'CHANGE_WEBCAM':
 			{
 				client.changeWebcam();
-
-				break;
-			}
-
-			case 'ENABLE_AUDIO_ONLY':
-			{
-				client.enableAudioOnly();
-
-				break;
-			}
-
-			case 'DISABLE_AUDIO_ONLY':
-			{
-				client.disableAudioOnly();
-
-				break;
-			}
-
-			case 'RESTART_ICE':
-			{
-				client.restartIce();
 
 				break;
 			}

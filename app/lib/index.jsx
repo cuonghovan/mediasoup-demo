@@ -36,7 +36,6 @@ if (process.env.NODE_ENV === 'development')
 		middleware = compose(middleware, devToolsExtension());
 	}
 }
-
 const store = createReduxStore(
 	reducers,
 	undefined,
@@ -82,6 +81,16 @@ function run()
 	// NOTE: I don't like this.
 	store.dispatch(
 		stateActions.setMe({ peerName, displayName, displayNameSet, device }));
+	
+	// Join joom
+	/**
+	 * roomId: matchId
+	 * peerName: userId or random string (guest)
+	 * displayName: user name or anonymous (guest)
+	 * useSimulcast: currentUser.id === match.affirmative/negative.challengerId esle false
+	 * produce: currentUser.id === match.affirmative/negative.challengerId esle false
+	 * 
+	 */
 
 	// NOTE: I don't like this.
 	store.dispatch(

@@ -21,19 +21,6 @@ const peers = (state = initialState, action) =>
 			return newState;
 		}
 
-		case 'SET_PEER_DISPLAY_NAME':
-		{
-			const { displayName, peerName } = action.payload;
-			const peer = state[peerName];
-
-			if (!peer)
-				throw new Error('no Peer found');
-
-			const newPeer = { ...peer, displayName };
-
-			return { ...state, [newPeer.name]: newPeer };
-		}
-
 		case 'ADD_CONSUMER':
 		{
 			const { consumer, peerName } = action.payload;
