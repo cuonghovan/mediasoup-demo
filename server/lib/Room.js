@@ -43,12 +43,6 @@ class Room extends EventEmitter
 
 		// Current max bitrate for all the participants.
 		this._maxBitrate = MAX_BITRATE;
-
-		// Current active speaker.
-		// @type {mediasoup.Peer}
-		this._currentActiveSpeaker = null;
-
-		this._handleMediaRoom();
 	}
 
 	get id()
@@ -107,68 +101,6 @@ class Room extends EventEmitter
 		this._handleProtooPeer(protooPeer);
 	}
 
-	_handleMediaRoom()
-	{
-		logger.debug('_handleMediaRoom()');
-
-		const activeSpeakerDetector = this._mediaRoom.createActiveSpeakerDetector();
-
-		activeSpeakerDetector.on('activespeakerchange', (activePeer) =>
-		{
-			if (activePeer)
-			{
-				logger.info('new active speaker [peerName:"%s"]', activePeer.name);
-
-				this._currentActiveSpeaker = activePeer;
-
-				const activeVideoProducer = activePeer.producers
-					.find((producer) => producer.kind === 'video');
-
-				for (const peer of this._mediaRoom.peers)
-				{
-					for (const consumer of peer.consumers)
-					{
-						if (consumer.kind !== 'video')
-							continue;
-
-						if (consumer.source === activeVideoProducer)
-						{
-							consumer.setPreferredProfile('high');
-						}
-						else
-						{
-							consumer.setPreferredProfile('low');
-						}
-					}
-				}
-			}
-			else
-			{
-				logger.info('no active speaker');
-
-				this._currentActiveSpeaker = null;
-
-				for (const peer of this._mediaRoom.peers)
-				{
-					for (const consumer of peer.consumers)
-					{
-						if (consumer.kind !== 'video')
-							continue;
-
-						consumer.setPreferredProfile('low');
-					}
-				}
-			}
-
-			// Spread to others via protoo.
-			this._protooRoom.spread(
-				'active-speaker',
-				{
-					peerName : activePeer ? activePeer.name : null
-				});
-		});
-	}
-
 	_handleProtooPeer(protooPeer)
 	{
 		logger.debug('_handleProtooPeer() [peer:"%s"]', protooPeer.id);
@@ -199,29 +131,6 @@ class Room extends EventEmitter
 
 					this._handleMediasoupClientNotification(
 						protooPeer, mediasoupNotification);
-
-					break;
-				}
-
-				case 'change-display-name':
-				{
-					accept();
-
-					const { displayName } = request.data;
-					const { mediaPeer } = protooPeer.data;
-					const oldDisplayName = mediaPeer.appData.displayName;
-
-					mediaPeer.appData.displayName = displayName;
-
-					// Spread to others via protoo.
-					this._protooRoom.spread(
-						'display-name-changed',
-						{
-							peerName       : protooPeer.id,
-							displayName    : displayName,
-							oldDisplayName : oldDisplayName
-						},
-						[ protooPeer ]);
 
 					break;
 				}
@@ -312,17 +221,6 @@ class Room extends EventEmitter
 
 			this._handleMediaConsumer(consumer);
 		}
-
-		// Notify about the existing active speaker.
-		if (this._currentActiveSpeaker)
-		{
-			protooPeer.send(
-				'active-speaker',
-				{
-					peerName : this._currentActiveSpeaker.name
-				})
-				.catch(() => {});
-		}
 	}
 
 	_handleMediaTransport(transport)
@@ -380,11 +278,6 @@ class Room extends EventEmitter
 			logger.info(
 				'Consumer "effectiveprofilechange" event [profile:%s]', profile);
 		});
-
-		// If video, initially make it 'low' profile unless this is for the current
-		// active speaker.
-		if (consumer.kind === 'video' && consumer.peer !== this._currentActiveSpeaker)
-			consumer.setPreferredProfile('low');
 	}
 
 	_handleMediasoupClientRequest(protooPeer, request, accept, reject)

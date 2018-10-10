@@ -201,13 +201,6 @@ export default class RoomClient
 					break;
 				}
 
-				case 'active-speaker':
-				{
-					accept();
-
-					break;
-				}
-
 				default:
 				{
 					logger.error('unknown protoo method "%s"', request.method);
