@@ -6,13 +6,6 @@ export const Room = PropTypes.shape(
 			[ 'new', 'connecting', 'connected', 'closed' ]).isRequired
 	});
 
-export const Me = PropTypes.shape(
-	{
-		name                 : PropTypes.string.isRequired,
-		canChangeWebcam      : PropTypes.bool.isRequired,
-		webcamInProgress     : PropTypes.bool.isRequired
-	});
-
 export const Producer = PropTypes.shape(
 	{
 		id             : PropTypes.number.isRequired,

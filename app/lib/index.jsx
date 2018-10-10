@@ -69,10 +69,6 @@ function run()
 		window.history.pushState('', '', urlParser.toString());
 	}
 
-	// NOTE: I don't like this.
-	store.dispatch(
-		stateActions.setMe({ peerName }));
-
 	// Join joom
 	/**
 	 * roomId: matchId

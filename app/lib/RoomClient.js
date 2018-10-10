@@ -124,9 +124,6 @@ export default class RoomClient
 		// Store in cookie.
 		cookiesManager.setDevices({ webcamEnabled: true });
 
-		this._dispatch(
-			stateActions.setWebcamInProgress(true));
-
 		return Promise.resolve()
 			.then(() =>
 			{
@@ -136,17 +133,9 @@ export default class RoomClient
 			{
 				return this._setWebcamProducer();
 			})
-			.then(() =>
-			{
-				this._dispatch(
-					stateActions.setWebcamInProgress(false));
-			})
 			.catch((error) =>
 			{
 				logger.error('enableWebcam() | failed: %o', error);
-
-				this._dispatch(
-					stateActions.setWebcamInProgress(false));
 			});
 	}
 
@@ -157,32 +146,20 @@ export default class RoomClient
 		// Store in cookie.
 		cookiesManager.setDevices({ webcamEnabled: false });
 
-		this._dispatch(
-			stateActions.setWebcamInProgress(true));
-
 		return Promise.resolve()
 			.then(() =>
 			{
 				this._webcamProducer.close();
-
-				this._dispatch(
-					stateActions.setWebcamInProgress(false));
 			})
 			.catch((error) =>
 			{
 				logger.error('disableWebcam() | failed: %o', error);
-
-				this._dispatch(
-					stateActions.setWebcamInProgress(false));
 			});
 	}
 
 	changeWebcam()
 	{
 		logger.debug('changeWebcam()');
-
-		this._dispatch(
-			stateActions.setWebcamInProgress(true));
 
 		return Promise.resolve()
 			.then(() =>
@@ -245,16 +222,10 @@ export default class RoomClient
 			{
 				this._dispatch(
 					stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
-
-				this._dispatch(
-					stateActions.setWebcamInProgress(false));
 			})
 			.catch((error) =>
 			{
 				logger.error('changeWebcam() failed: %o', error);
-
-				this._dispatch(
-					stateActions.setWebcamInProgress(false));
 			});
 	}
 
@@ -736,9 +707,6 @@ export default class RoomClient
 					this._webcam.device = null;
 				else if (!this._webcams.has(currentWebcamId))
 					this._webcam.device = array[0];
-
-				this._dispatch(
-					stateActions.setCanChangeWebcam(this._webcams.size >= 2));
 			});
 	}
 
@@ -847,10 +815,6 @@ export default class RoomClient
 		// Receive the consumer (if we can).
 		if (consumer.supported)
 		{
-			// Pause it if video and we are in audio-only mode.
-			if (consumer.kind === 'video' && this._getState().me.audioOnly)
-				consumer.pause('audio-only-mode');
-
 			consumer.receive(this._recvTransport)
 				.then((track) =>
 				{

@@ -6,22 +6,6 @@ export const setRoomState = (state) =>
 	};
 };
 
-export const setMe = ({ peerName }) =>
-{
-	return {
-		type    : 'SET_ME',
-		payload : { peerName }
-	};
-};
-
-export const setCanChangeWebcam = (flag) =>
-{
-	return {
-		type    : 'SET_CAN_CHANGE_WEBCAM',
-		payload : flag
-	};
-};
-
 export const addProducer = (producer) =>
 {
 	return {
@@ -59,14 +43,6 @@ export const setProducerTrack = (producerId, track) =>
 	return {
 		type    : 'SET_PRODUCER_TRACK',
 		payload : { producerId, track }
-	};
-};
-
-export const setWebcamInProgress = (flag) =>
-{
-	return {
-		type    : 'SET_WEBCAM_IN_PROGRESS',
-		payload : { flag }
 	};
 };
 

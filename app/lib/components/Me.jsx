@@ -19,7 +19,6 @@ class Me extends React.Component
 	{
 		const {
 			connected,
-			me,
 			micProducer,
 			webcamProducer,
 			onMuteMic,
@@ -55,9 +54,7 @@ class Me extends React.Component
 						/>
 
 						<div
-							className={classnames('button', 'webcam', webcamState, {
-								disabled : me.webcamInProgress
-							})}
+							className={classnames('button', 'webcam', webcamState)}
 							onClick={() =>
 							{
 								webcamState === 'on' ? onDisableWebcam() : onEnableWebcam();
@@ -81,7 +78,6 @@ class Me extends React.Component
 Me.propTypes =
 {
 	connected           : PropTypes.bool.isRequired,
-	me                  : appPropTypes.Me.isRequired,
 	micProducer         : appPropTypes.Producer,
 	webcamProducer      : appPropTypes.Producer,
 	onMuteMic           : PropTypes.func.isRequired,
@@ -100,7 +96,6 @@ const mapStateToProps = (state) =>
 
 	return {
 		connected      : state.room.state === 'connected',
-		me             : state.me,
 		micProducer    : micProducer,
 		webcamProducer : webcamProducer
 	};
