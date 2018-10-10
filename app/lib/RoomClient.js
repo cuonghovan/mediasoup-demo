@@ -413,15 +413,6 @@ export default class RoomClient
 			})
 			.then(() =>
 			{
-				// Set our media capabilities.
-				this._dispatch(stateActions.setMediaCapabilities(
-					{
-						canSendMic    : this._room.canSend('audio'),
-						canSendWebcam : this._room.canSend('video')
-					}));
-			})
-			.then(() =>
-			{
 				// Don't produce if explicitely requested to not to do it.
 				if (!this._produce)
 					return;

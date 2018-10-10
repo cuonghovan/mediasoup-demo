@@ -14,14 +14,6 @@ export const setMe = ({ peerName }) =>
 	};
 };
 
-export const setMediaCapabilities = ({ canSendMic, canSendWebcam }) =>
-{
-	return {
-		type    : 'SET_MEDIA_CAPABILITIES',
-		payload : { canSendMic, canSendWebcam }
-	};
-};
-
 export const setCanChangeWebcam = (flag) =>
 {
 	return {

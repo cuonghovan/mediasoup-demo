@@ -1,8 +1,6 @@
 const initialState =
 {
 	name                 : null,
-	canSendMic           : false,
-	canSendWebcam        : false,
 	canChangeWebcam      : false,
 	webcamInProgress     : false
 };
@@ -16,13 +14,6 @@ const me = (state = initialState, action) =>
 			const { peerName } = action.payload;
 
 			return { ...state, name: peerName };
-		}
-
-		case 'SET_MEDIA_CAPABILITIES':
-		{
-			const { canSendMic, canSendWebcam } = action.payload;
-
-			return { ...state, canSendMic, canSendWebcam };
 		}
 
 		case 'SET_CAN_CHANGE_WEBCAM':

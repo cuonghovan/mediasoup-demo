@@ -9,8 +9,6 @@ export const Room = PropTypes.shape(
 export const Me = PropTypes.shape(
 	{
 		name                 : PropTypes.string.isRequired,
-		canSendMic           : PropTypes.bool.isRequired,
-		canSendWebcam        : PropTypes.bool.isRequired,
 		canChangeWebcam      : PropTypes.bool.isRequired,
 		webcamInProgress     : PropTypes.bool.isRequired
 	});

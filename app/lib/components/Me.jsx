@@ -31,26 +31,8 @@ class Me extends React.Component
 		// Not a producer
 		if (!micProducer && !webcamProducer) return null;
 
-		let micState;
-
-		if (!me.canSendMic)
-			micState = 'unsupported';
-		else if (!micProducer)
-			micState = 'unsupported';
-		else if (!micProducer.locallyPaused && !micProducer.remotelyPaused)
-			micState = 'on';
-		else
-			micState = 'off';
-
-		let webcamState;
-
-		if (!me.canSendWebcam)
-			webcamState = 'unsupported';
-		else if (webcamProducer)
-			webcamState = 'on';
-		else
-			webcamState = 'off';
-
+		const micState = (micProducer && !micProducer.locallyPaused && !micProducer.remotelyPaused) ? 'on' : 'off';
+		const webcamState = webcamProducer ? 'on' : 'off';
 		const videoVisible = (
 			Boolean(webcamProducer) &&
 			!webcamProducer.locallyPaused &&
