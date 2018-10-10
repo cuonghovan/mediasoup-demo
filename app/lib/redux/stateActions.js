@@ -101,26 +101,3 @@ export const setConsumerTrack = (consumerId, track) =>
 		payload : { consumerId, track }
 	};
 };
-
-export const addNotification = (notification) =>
-{
-	return {
-		type    : 'ADD_NOTIFICATION',
-		payload : { notification }
-	};
-};
-
-export const removeNotification = (notificationId) =>
-{
-	return {
-		type    : 'REMOVE_NOTIFICATION',
-		payload : { notificationId }
-	};
-};
-
-export const removeAllNotifications = () =>
-{
-	return {
-		type : 'REMOVE_ALL_NOTIFICATIONS'
-	};
-};

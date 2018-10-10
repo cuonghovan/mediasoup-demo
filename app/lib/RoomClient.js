@@ -240,12 +240,6 @@ export default class RoomClient
 		{
 			logger.warn('protoo Peer "disconnected" event');
 
-			this._dispatch(requestActions.notify(
-				{
-					type : 'error',
-					text : 'WebSocket disconnected'
-				}));
-
 			// Leave Room.
 			try { this._room.remoteClose({ cause: 'protoo disconnected' }); }
 			catch (error) {}
@@ -405,15 +399,6 @@ export default class RoomClient
 			})
 			.then(() =>
 			{
-				// Clean all the existing notifcations.
-				this._dispatch(stateActions.removeAllNotifications());
-
-				this._dispatch(requestActions.notify(
-					{
-						text    : 'You are in the room',
-						timeout : 5000
-					}));
-
 				const peers = this._room.peers;
 
 				for (const peer of peers)
@@ -424,12 +409,6 @@ export default class RoomClient
 			.catch((error) =>
 			{
 				logger.error('_joinRoom() failed:%o', error);
-
-				this._dispatch(requestActions.notify(
-					{
-						type : 'error',
-						text : `Could not join the room: ${error.toString()}`
-					}));
 
 				this.close();
 			});
@@ -526,11 +505,6 @@ export default class RoomClient
 			.catch((error) =>
 			{
 				logger.error('_setMicProducer() failed:%o', error);
-
-				this._dispatch(requestActions.notify(
-					{
-						text : `Mic producer failed: ${error.name}:${error.message}`
-					}));
 
 				if (producer)
 					producer.close();
@@ -647,11 +621,6 @@ export default class RoomClient
 			.catch((error) =>
 			{
 				logger.error('_setWebcamProducer() failed:%o', error);
-
-				this._dispatch(requestActions.notify(
-					{
-						text : `Webcam producer failed: ${error.name}:${error.message}`
-					}));
 
 				if (producer)
 					producer.close();
