@@ -12,7 +12,7 @@ const Room = ({ peers }) =>
 			<div data-component='Peers'>
 				<Me />
 				{
-					peers.map((peer) => <Peer key={peer.name} name={peer.name} />)
+					peers.map((peer) => <Peer key={peer.name} peer={peer} />)
 				}
 			</div>
 		</div>

@@ -13,8 +13,6 @@ export default ({ dispatch, getState }) => (next) =>
 				const {
 					roomId,
 					peerName,
-					displayName,
-					device,
 					useSimulcast,
 					produce
 				} = action.payload;
@@ -23,8 +21,6 @@ export default ({ dispatch, getState }) => (next) =>
 					{
 						roomId,
 						peerName,
-						displayName,
-						device,
 						useSimulcast,
 						produce,
 						dispatch,

@@ -1,9 +1,6 @@
 const initialState =
 {
 	name                 : null,
-	displayName          : null,
-	displayNameSet       : false,
-	device               : null,
 	canSendMic           : false,
 	canSendWebcam        : false,
 	canChangeWebcam      : false,
@@ -16,9 +13,9 @@ const me = (state = initialState, action) =>
 	{
 		case 'SET_ME':
 		{
-			const { peerName, displayName, displayNameSet, device } = action.payload;
+			const { peerName } = action.payload;
 
-			return { ...state, name: peerName, displayName, displayNameSet, device };
+			return { ...state, name: peerName };
 		}
 
 		case 'SET_MEDIA_CAPABILITIES':

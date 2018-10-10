@@ -9,7 +9,6 @@ import {
 	compose
 } from 'redux';
 import thunk from 'redux-thunk';
-import { getDeviceInfo } from 'mediasoup-client';
 import randomString from 'random-string';
 import Logger from './Logger';
 import * as utils from './utils';
@@ -57,11 +56,6 @@ function run()
 
 	// TODO: Use userid (logged in) or random string (guest)
 	const peerName = randomString({ length: 8 }).toLowerCase();
-
-	// TODO: Use user name (logged in) or "nanonymous" (guest)
-	const displayName =randomString({ length: 8 }).toLowerCase();
-	const displayNameSet = true;
-	
 	const urlParser = new UrlParse(window.location.href, true);
 	let roomId = urlParser.query.roomId;
 	const produce = urlParser.query.produce !== 'false';
@@ -75,27 +69,22 @@ function run()
 		window.history.pushState('', '', urlParser.toString());
 	}
 
-	// Get current device.
-	const device = getDeviceInfo();
-
 	// NOTE: I don't like this.
 	store.dispatch(
-		stateActions.setMe({ peerName, displayName, displayNameSet, device }));
-	
+		stateActions.setMe({ peerName }));
+
 	// Join joom
 	/**
 	 * roomId: matchId
 	 * peerName: userId or random string (guest)
-	 * displayName: user name or anonymous (guest)
 	 * useSimulcast: currentUser.id === match.affirmative/negative.challengerId esle false
 	 * produce: currentUser.id === match.affirmative/negative.challengerId esle false
-	 * 
 	 */
 
 	// NOTE: I don't like this.
 	store.dispatch(
 		requestActions.joinRoom(
-			{ roomId, peerName, displayName, device, useSimulcast, produce }));
+			{ roomId, peerName, useSimulcast, produce }));
 
 	render(
 		<Provider store={store}>

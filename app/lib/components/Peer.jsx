@@ -6,7 +6,6 @@ import PeerView from './PeerView';
 const Peer = (props) =>
 {
 	const {
-		peer,
 		micConsumer,
 		webcamConsumer
 	} = props;
@@ -52,7 +51,6 @@ const Peer = (props) =>
 			}
 
 			<PeerView
-				peer={peer}
 				audioTrack={micConsumer ? micConsumer.track : null}
 				videoTrack={webcamConsumer ? webcamConsumer.track : null}
 				videoVisible={videoVisible}
@@ -66,14 +64,12 @@ const Peer = (props) =>
 
 Peer.propTypes =
 {
-	peer           : appPropTypes.Peer.isRequired,
 	micConsumer    : appPropTypes.Consumer,
 	webcamConsumer : appPropTypes.Consumer
 };
 
-const mapStateToProps = (state, { name }) =>
+const mapStateToProps = (state, { peer }) =>
 {
-	const peer = state.peers[name];
 	const consumersArray = peer.consumers
 		.map((consumerId) => state.consumers[consumerId]);
 	const micConsumer =
@@ -82,7 +78,6 @@ const mapStateToProps = (state, { name }) =>
 		consumersArray.find((consumer) => consumer.source === 'webcam');
 
 	return {
-		peer,
 		micConsumer,
 		webcamConsumer
 	};

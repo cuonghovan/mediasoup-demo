@@ -27,12 +27,8 @@ const VIDEO_CONSTRAINS =
 export default class RoomClient
 {
 	constructor(
-		{ roomId, peerName, displayName, device, useSimulcast, produce, dispatch, getState })
+		{ roomId, peerName, useSimulcast, produce, dispatch, getState })
 	{
-		logger.debug(
-			'constructor() [roomId:"%s", peerName:"%s", displayName:"%s", device:%s]',
-			roomId, peerName, displayName, device.flag);
-
 		const protooUrl = getProtooUrl(peerName, roomId);
 		const protooTransport = new protooClient.WebSocketTransport(protooUrl);
 
@@ -85,7 +81,7 @@ export default class RoomClient
 			resolution : 'hd'
 		};
 
-		this._join({ displayName, device });
+		this._join();
 	}
 
 	close()
@@ -262,7 +258,7 @@ export default class RoomClient
 			});
 	}
 
-	_join({ displayName, device })
+	_join()
 	{
 		this._dispatch(stateActions.setRoomState('connecting'));
 
@@ -270,7 +266,7 @@ export default class RoomClient
 		{
 			logger.debug('protoo Peer "open" event');
 
-			this._joinRoom({ displayName, device });
+			this._joinRoom();
 		});
 
 		this._protoo.on('disconnected', () =>
@@ -336,7 +332,7 @@ export default class RoomClient
 		});
 	}
 
-	_joinRoom({ displayName, device })
+	_joinRoom()
 	{
 		logger.debug('_joinRoom()');
 
@@ -388,7 +384,7 @@ export default class RoomClient
 			this._handlePeer(peer);
 		});
 
-		this._room.join(this._peerName, { displayName, device })
+		this._room.join(this._peerName)
 			.then(() =>
 			{
 				// Create Transport for receiving.
@@ -773,23 +769,11 @@ export default class RoomClient
 
 	_handlePeer(peer, { notify = true } = {})
 	{
-		const displayName = peer.appData.displayName;
-
 		this._dispatch(stateActions.addPeer(
 			{
 				name        : peer.name,
-				displayName : displayName,
-				device      : peer.appData.device,
 				consumers   : []
 			}));
-
-		if (notify)
-		{
-			this._dispatch(requestActions.notify(
-				{
-					text : `${displayName} joined the room`
-				}));
-		}
 
 		for (const consumer of peer.consumers)
 		{
@@ -803,14 +787,6 @@ export default class RoomClient
 				peer.name, originator);
 
 			this._dispatch(stateActions.removePeer(peer.name));
-
-			if (this._room.joined)
-			{
-				this._dispatch(requestActions.notify(
-					{
-						text : `${peer.appData.displayName} left the room`
-					}));
-			}
 		});
 
 		peer.on('newconsumer', (consumer) =>

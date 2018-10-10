@@ -2,25 +2,13 @@ import PropTypes from 'prop-types';
 
 export const Room = PropTypes.shape(
 	{
-		url   : PropTypes.string.isRequired,
 		state : PropTypes.oneOf(
-			[ 'new', 'connecting', 'connected', 'closed' ]).isRequired,
-		activeSpeakerName : PropTypes.string
-	});
-
-export const Device = PropTypes.shape(
-	{
-		flag    : PropTypes.string.isRequired,
-		name    : PropTypes.string.isRequired,
-		version : PropTypes.string
+			[ 'new', 'connecting', 'connected', 'closed' ]).isRequired
 	});
 
 export const Me = PropTypes.shape(
 	{
 		name                 : PropTypes.string.isRequired,
-		displayName          : PropTypes.string,
-		displayNameSet       : PropTypes.bool.isRequired,
-		device               : Device.isRequired,
 		canSendMic           : PropTypes.bool.isRequired,
 		canSendWebcam        : PropTypes.bool.isRequired,
 		canChangeWebcam      : PropTypes.bool.isRequired,
@@ -42,8 +30,6 @@ export const Producer = PropTypes.shape(
 export const Peer = PropTypes.shape(
 	{
 		name        : PropTypes.string.isRequired,
-		displayName : PropTypes.string,
-		device      : Device.isRequired,
 		consumers   : PropTypes.arrayOf(PropTypes.number).isRequired
 	});
 
