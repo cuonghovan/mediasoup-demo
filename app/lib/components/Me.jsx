@@ -18,7 +18,6 @@ class Me extends React.Component
 	render()
 	{
 		const {
-			connected,
 			micProducer,
 			webcamProducer,
 			onMuteMic,
@@ -43,26 +42,23 @@ class Me extends React.Component
 				data-component='Peer'
 				ref={(node) => (this._rootNode = node)}
 			>
-				{connected ?
-					<div className='controls'>
-						<div
-							className={classnames('button', 'mic', micState)}
-							onClick={() =>
-							{
-								micState === 'on' ? onMuteMic() : onUnmuteMic();
-							}}
-						/>
+				<div className='controls'>
+					<div
+						className={classnames('button', 'mic', micState)}
+						onClick={() =>
+						{
+							micState === 'on' ? onMuteMic() : onUnmuteMic();
+						}}
+					/>
 
-						<div
-							className={classnames('button', 'webcam', webcamState)}
-							onClick={() =>
-							{
-								webcamState === 'on' ? onDisableWebcam() : onEnableWebcam();
-							}}
-						/>
-					</div>
-					:null
-				}
+					<div
+						className={classnames('button', 'webcam', webcamState)}
+						onClick={() =>
+						{
+							webcamState === 'on' ? onDisableWebcam() : onEnableWebcam();
+						}}
+					/>
+				</div>
 
 				<PeerView
 					isMe
@@ -77,7 +73,6 @@ class Me extends React.Component
 
 Me.propTypes =
 {
-	connected           : PropTypes.bool.isRequired,
 	micProducer         : appPropTypes.Producer,
 	webcamProducer      : appPropTypes.Producer,
 	onMuteMic           : PropTypes.func.isRequired,
@@ -95,7 +90,6 @@ const mapStateToProps = (state) =>
 		producersArray.find((producer) => producer.source === 'webcam');
 
 	return {
-		connected      : state.room.state === 'connected',
 		micProducer    : micProducer,
 		webcamProducer : webcamProducer
 	};
@@ -107,7 +101,7 @@ const mapDispatchToProps = (dispatch) =>
 		onMuteMic       : () => dispatch(requestActions.muteMic()),
 		onUnmuteMic     : () => dispatch(requestActions.unmuteMic()),
 		onEnableWebcam  : () => dispatch(requestActions.enableWebcam()),
-		onDisableWebcam : () => dispatch(requestActions.disableWebcam()),
+		onDisableWebcam : () => dispatch(requestActions.disableWebcam())
 	};
 };
 

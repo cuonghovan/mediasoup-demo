@@ -1,11 +1,3 @@
-export const setRoomState = (state) =>
-{
-	return {
-		type    : 'SET_ROOM_STATE',
-		payload : { state }
-	};
-};
-
 export const addProducer = (producer) =>
 {
 	return {

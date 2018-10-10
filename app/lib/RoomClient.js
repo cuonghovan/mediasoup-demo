@@ -99,8 +99,6 @@ export default class RoomClient
 		// Close protoo Peer (wait a bit so mediasoup-client can send
 		// the 'leaveRoom' notification).
 		setTimeout(() => this._protoo.close(), 250);
-
-		this._dispatch(stateActions.setRoomState('closed'));
 	}
 
 	muteMic()
@@ -231,8 +229,6 @@ export default class RoomClient
 
 	_join()
 	{
-		this._dispatch(stateActions.setRoomState('connecting'));
-
 		this._protoo.on('open', () =>
 		{
 			logger.debug('protoo Peer "open" event');
@@ -253,8 +249,6 @@ export default class RoomClient
 			// Leave Room.
 			try { this._room.remoteClose({ cause: 'protoo disconnected' }); }
 			catch (error) {}
-
-			this._dispatch(stateActions.setRoomState('connecting'));
 		});
 
 		this._protoo.on('close', () =>
@@ -317,8 +311,6 @@ export default class RoomClient
 			if (originator === 'remote')
 			{
 				logger.warn('mediasoup Peer/Room remotely closed [appData:%o]', appData);
-
-				this._dispatch(stateActions.setRoomState('closed'));
 
 				return;
 			}
@@ -413,8 +405,6 @@ export default class RoomClient
 			})
 			.then(() =>
 			{
-				this._dispatch(stateActions.setRoomState('connected'));
-
 				// Clean all the existing notifcations.
 				this._dispatch(stateActions.removeAllNotifications());
 
