@@ -3,7 +3,6 @@ import * as mediasoupClient from 'mediasoup-client';
 import Logger from './Logger';
 import { getProtooUrl } from './urlFactory';
 import * as cookiesManager from './cookiesManager';
-import * as requestActions from './redux/requestActions';
 import * as stateActions from './redux/stateActions';
 
 const logger = new Logger('RoomClient');
@@ -152,78 +151,6 @@ export default class RoomClient
 			.catch((error) =>
 			{
 				logger.error('disableWebcam() | failed: %o', error);
-			});
-	}
-
-	changeWebcam()
-	{
-		logger.debug('changeWebcam()');
-
-		return Promise.resolve()
-			.then(() =>
-			{
-				return this._updateWebcams();
-			})
-			.then(() =>
-			{
-				const array = Array.from(this._webcams.keys());
-				const len = array.length;
-				const deviceId =
-					this._webcam.device ? this._webcam.device.deviceId : undefined;
-				let idx = array.indexOf(deviceId);
-
-				if (idx < len - 1)
-					idx++;
-				else
-					idx = 0;
-
-				this._webcam.device = this._webcams.get(array[idx]);
-
-				logger.debug(
-					'changeWebcam() | new selected webcam [device:%o]',
-					this._webcam.device);
-
-				// Reset video resolution to HD.
-				this._webcam.resolution = 'hd';
-			})
-			.then(() =>
-			{
-				const { device, resolution } = this._webcam;
-
-				if (!device)
-					throw new Error('no webcam devices');
-
-				logger.debug('changeWebcam() | calling getUserMedia()');
-
-				return navigator.mediaDevices.getUserMedia(
-					{
-						video :
-						{
-							deviceId : { exact: device.deviceId },
-							...VIDEO_CONSTRAINS[resolution]
-						}
-					});
-			})
-			.then((stream) =>
-			{
-				const track = stream.getVideoTracks()[0];
-
-				return this._webcamProducer.replaceTrack(track)
-					.then((newTrack) =>
-					{
-						track.stop();
-
-						return newTrack;
-					});
-			})
-			.then((newTrack) =>
-			{
-				this._dispatch(
-					stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
-			})
-			.catch((error) =>
-			{
-				logger.error('changeWebcam() failed: %o', error);
 			});
 	}
 
@@ -685,7 +612,7 @@ export default class RoomClient
 		}
 	}
 
-	_handlePeer(peer, { notify = true } = {})
+	_handlePeer(peer)
 	{
 		this._dispatch(stateActions.addPeer(
 			{

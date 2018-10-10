@@ -23,7 +23,8 @@ class Me extends React.Component
 			onMuteMic,
 			onUnmuteMic,
 			onEnableWebcam,
-			onDisableWebcam
+			onDisableWebcam,
+			leaveRoom
 		} = this.props;
 
 		// Not a producer
@@ -58,6 +59,11 @@ class Me extends React.Component
 							webcamState === 'on' ? onDisableWebcam() : onEnableWebcam();
 						}}
 					/>
+
+					<div
+						className='button'
+						onClick={() => leaveRoom()}
+					/>
 				</div>
 
 				<PeerView
@@ -78,7 +84,8 @@ Me.propTypes =
 	onMuteMic           : PropTypes.func.isRequired,
 	onUnmuteMic         : PropTypes.func.isRequired,
 	onEnableWebcam      : PropTypes.func.isRequired,
-	onDisableWebcam     : PropTypes.func.isRequired
+	onDisableWebcam     : PropTypes.func.isRequired,
+	leaveRoom						: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -101,7 +108,8 @@ const mapDispatchToProps = (dispatch) =>
 		onMuteMic       : () => dispatch(requestActions.muteMic()),
 		onUnmuteMic     : () => dispatch(requestActions.unmuteMic()),
 		onEnableWebcam  : () => dispatch(requestActions.enableWebcam()),
-		onDisableWebcam : () => dispatch(requestActions.disableWebcam())
+		onDisableWebcam : () => dispatch(requestActions.disableWebcam()),
+		leaveRoom				: () => dispatch(requestActions.leaveRoom())
 	};
 };
 

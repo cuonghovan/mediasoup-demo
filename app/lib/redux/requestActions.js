@@ -41,10 +41,3 @@ export const disableWebcam = () =>
 		type : 'DISABLE_WEBCAM'
 	};
 };
-
-export const changeWebcam = () =>
-{
-	return {
-		type : 'CHANGE_WEBCAM'
-	};
-};

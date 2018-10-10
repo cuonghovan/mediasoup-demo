@@ -67,13 +67,6 @@ export default ({ dispatch, getState }) => (next) =>
 
 				break;
 			}
-
-			case 'CHANGE_WEBCAM':
-			{
-				client.changeWebcam();
-
-				break;
-			}
 		}
 
 		return next(action);
