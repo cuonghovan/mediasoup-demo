@@ -1,11 +1,12 @@
-import protooClient from 'protoo-client';
 import * as mediasoupClient from 'mediasoup-client';
 import Logger from './Logger';
-import { getProtooUrl } from './urlFactory';
 import * as cookiesManager from './cookiesManager';
 import * as stateActions from './redux/stateActions';
+import io from 'socket.io-client';
 
 const logger = new Logger('RoomClient');
+
+const serverUrl = 'https://localhost:3443';
 
 const ROOM_OPTIONS =
 {
@@ -28,8 +29,7 @@ export default class RoomClient
 	constructor(
 		{ roomId, peerName, useSimulcast, produce, dispatch, getState })
 	{
-		const protooUrl = getProtooUrl(peerName, roomId);
-		const protooTransport = new protooClient.WebSocketTransport(protooUrl);
+		this._socket = io(serverUrl, { query: { roomId, peerName } });
 
 		// Closed flag.
 		this._closed = false;
@@ -48,9 +48,6 @@ export default class RoomClient
 
 		// My peer name.
 		this._peerName = peerName;
-
-		// protoo-client Peer instance.
-		this._protoo = new protooClient.Peer(protooTransport);
 
 		// mediasoup-client Room instance.
 		this._room = new mediasoupClient.Room(ROOM_OPTIONS);
@@ -80,7 +77,7 @@ export default class RoomClient
 			resolution : 'hd'
 		};
 
-		this._join();
+		this._joinRoom();
 	}
 
 	close()
@@ -97,7 +94,7 @@ export default class RoomClient
 
 		// Close protoo Peer (wait a bit so mediasoup-client can send
 		// the 'leaveRoom' notification).
-		setTimeout(() => this._protoo.close(), 250);
+		setTimeout(() => this._socket.close(), 250);
 	}
 
 	muteMic()
@@ -154,66 +151,16 @@ export default class RoomClient
 			});
 	}
 
-	_join()
-	{
-		this._protoo.on('open', () =>
-		{
-			logger.debug('protoo Peer "open" event');
-
-			this._joinRoom();
-		});
-
-		this._protoo.on('disconnected', () =>
-		{
-			logger.warn('protoo Peer "disconnected" event');
-
-			// Leave Room.
-			try { this._room.remoteClose({ cause: 'protoo disconnected' }); }
-			catch (error) {}
-		});
-
-		this._protoo.on('close', () =>
-		{
-			if (this._closed)
-				return;
-
-			logger.warn('protoo Peer "close" event');
-
-			this.close();
-		});
-
-		this._protoo.on('request', (request, accept, reject) =>
-		{
-			logger.debug(
-				'_handleProtooRequest() [method:%s, data:%o]',
-				request.method, request.data);
-
-			switch (request.method)
-			{
-				case 'mediasoup-notification':
-				{
-					accept();
-
-					const notification = request.data;
-
-					this._room.receiveNotification(notification);
-
-					break;
-				}
-
-				default:
-				{
-					logger.error('unknown protoo method "%s"', request.method);
-
-					reject(404, 'unknown method');
-				}
-			}
-		});
-	}
-
 	_joinRoom()
 	{
 		logger.debug('_joinRoom()');
+
+		// Handle notifications from server
+		this._socket.on('mediasoup-notification', (notification) => 
+		{
+			logger.debug('New notification came from server:', notification);
+			this._room.receiveNotification(notification);
+		});
 
 		// NOTE: We allow rejoining (room.join()) the same mediasoup Room when Protoo
 		// WebSocket re-connects, so we must clean existing event listeners. Otherwise
@@ -230,27 +177,34 @@ export default class RoomClient
 			}
 		});
 
+		// Send requests to server
 		this._room.on('request', (request, callback, errback) =>
 		{
 			logger.debug(
 				'sending mediasoup request [method:%s]:%o', request.method, request);
 
-			this._protoo.send('mediasoup-request', request)
-				.then(callback)
-				.catch(errback);
+			this._socket.emit('mediasoup-request', request, (err, response) => 
+			{
+				if (!err) 
+				{
+					// Success response, so pass the mediasoup response to the local Room.
+					callback(response);
+				} 
+				else 
+				{
+					errback(err);
+				}
+			});
 		});
 
+		// Send notifications to sever
 		this._room.on('notify', (notification) =>
 		{
 			logger.debug(
 				'sending mediasoup notification [method:%s]:%o',
 				notification.method, notification);
 
-			this._protoo.send('mediasoup-notification', notification)
-				.catch((error) =>
-				{
-					logger.warn('could not send mediasoup notification:%o', error);
-				});
+			this._socket.emit('mediasoup-notification', notification);
 		});
 
 		this._room.on('newpeer', (peer) =>
