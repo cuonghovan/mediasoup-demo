@@ -29,7 +29,8 @@ export default class RoomClient
 	constructor(
 		{ roomId, peerName, useSimulcast, produce, dispatch, getState })
 	{
-		this._socket = io(serverUrl, { query: { roomId, peerName } });
+		this._socket = io.connect(serverUrl, 
+			{ secure: true, reconnect: true, rejectUnauthorized: false, query: { roomId, peerName } });
 
 		// Closed flag.
 		this._closed = false;
