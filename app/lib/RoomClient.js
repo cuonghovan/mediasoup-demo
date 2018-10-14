@@ -6,7 +6,7 @@ import io from 'socket.io-client';
 
 const logger = new Logger('RoomClient');
 
-const serverUrl = 'https://localhost:3443';
+const serverUrl = 'https://192.168.1.110:3443';
 
 const ROOM_OPTIONS =
 {

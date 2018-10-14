@@ -88,19 +88,19 @@ Me.propTypes =
 	leaveRoom						: PropTypes.func.isRequired
 };
 
-const mapStateToProps = (state) =>
-{
-	const producersArray = Object.values(state.producers);
-	const micProducer =
-		producersArray.find((producer) => producer.source === 'mic');
-	const webcamProducer =
-		producersArray.find((producer) => producer.source === 'webcam');
+// const mapStateToProps = (state) =>
+// {
+// 	const producersArray = Object.values(state.producers);
+// 	const micProducer =
+// 		producersArray.find((producer) => producer.source === 'mic');
+// 	const webcamProducer =
+// 		producersArray.find((producer) => producer.source === 'webcam');
 
-	return {
-		micProducer    : micProducer,
-		webcamProducer : webcamProducer
-	};
-};
+// 	return {
+// 		micProducer    : micProducer,
+// 		webcamProducer : webcamProducer
+// 	};
+// };
 
 const mapDispatchToProps = (dispatch) =>
 {
@@ -114,7 +114,7 @@ const mapDispatchToProps = (dispatch) =>
 };
 
 const MeContainer = connect(
-	mapStateToProps,
+	null,
 	mapDispatchToProps
 )(Me);
 

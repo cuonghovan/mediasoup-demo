@@ -68,21 +68,4 @@ Peer.propTypes =
 	webcamConsumer : appPropTypes.Consumer
 };
 
-const mapStateToProps = (state, { peer }) =>
-{
-	const consumersArray = peer.consumers
-		.map((consumerId) => state.consumers[consumerId]);
-	const micConsumer =
-		consumersArray.find((consumer) => consumer.source === 'mic');
-	const webcamConsumer =
-		consumersArray.find((consumer) => consumer.source === 'webcam');
-
-	return {
-		micConsumer,
-		webcamConsumer
-	};
-};
-
-const PeerContainer = connect(mapStateToProps)(Peer);
-
-export default PeerContainer;
+export default Peer;
