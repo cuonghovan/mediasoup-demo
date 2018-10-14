@@ -25,8 +25,6 @@ class Room extends EventEmitter
 		// Closed flag.
 		this._closed = false;
 
-		// mediasoup Peer instance
-		this._mediaPeer = null;
 		
 		try
 		{
@@ -75,6 +73,8 @@ class Room extends EventEmitter
 
 	handleConnection(socket, peerName)
 	{
+		let mediaPeer = null;
+
 		// Handle requests from client
 		socket.on('mediasoup-request', (request, cb) =>
 		{
@@ -91,9 +91,9 @@ class Room extends EventEmitter
 						.then((response) =>
 						{
 							// Get the newly created mediasoup Peer
-							this._mediaPeer = this._mediaRoom.getPeerByName(peerName);
+							mediaPeer = this._mediaRoom.getPeerByName(peerName);
 
-							this._handleMediaPeer(this._mediaPeer);
+							this._handleMediaPeer(socket, mediaPeer);
 
 							// Send response back
 							cb(null, response);
@@ -102,9 +102,9 @@ class Room extends EventEmitter
 					break;
 
 				default:
-					if (this._mediaPeer)
+					if (mediaPeer)
 					{
-						this._mediaPeer.receiveRequest(request)
+						mediaPeer.receiveRequest(request)
 							.then((response) => cb(null, response))
 							.catch((error) => cb(error.toString()));
 					}
@@ -117,21 +117,21 @@ class Room extends EventEmitter
 			logger.debug('Got notification from client peer', notification);
 	
 			// NOTE: mediasoup-client just sends notifications with target 'peer'
-			if (!this._mediaPeer) 
+			if (!mediaPeer) 
 			{
 				logger.error('Cannot handle mediaSoup notification, no mediaSoup Peer');
 				
 				return;
 			}
 	
-			this._mediaPeer.receiveNotification(notification);
+			mediaPeer.receiveNotification(notification);
 		});
 
 		// Invokes when connection lost on a client side
 		socket.on('disconnect', () => 
 		{
-			if (this._mediaPeer && !this._mediaPeer.closed)
-				this._mediaPeer.close();
+			if (mediaPeer && !mediaPeer.closed)
+				mediaPeer.close();
 
 			// If this is the latest peer in the room, close the room.
 			// However wait a bit (for reconnections).
@@ -152,8 +152,14 @@ class Room extends EventEmitter
 		});
 	}
 
-	_handleMediaPeer(mediaPeer)
+	_handleMediaPeer(socket, mediaPeer)
 	{
+		mediaPeer.on('notify', (notification) =>
+		{
+			socket.emit('mediasoup-notification', notification)
+				.catch((err) => logger.error(err));
+		});
+
 		mediaPeer.on('newtransport', (transport) =>
 		{
 			logger.info(
