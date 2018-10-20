@@ -6,12 +6,19 @@ const cors = require('cors');
 const express = require('express');
 const https = require('https');
 const mediasoup = require('mediasoup');
+const bodyParser = require('body-parser');
+const multer = require('multer');
 const Logger = require('./lib/Logger');
 const Room = require('./lib/Room');
+const upload = multer({ dest: 'uploads/' });
+const readline = require("readline");
+const readJson = require("r-json");
+const { google } = require("googleapis");
 
 const app = express();
 
 app.use(cors());
+app.use(bodyParser.json());
 
 const logger = new Logger();
 
@@ -103,4 +110,83 @@ socketServer.on('connection', (socket) =>
 	}
 
 	room.handleConnection(socket, peerName);
+});
+
+//------------Upload  recorded videos to Youtube --------------------------------------------------------------------------
+/**
+ * To use OAuth2 authentication, we need access to a a CLIENT_ID, CLIENT_SECRET, AND REDIRECT_URI.  
+ * To get these credentials for your application, visit https://console.cloud.google.com/apis/credentials.
+ */
+const CREDENTIALS = readJson(`${__dirname}/configs/oauth2.keys.json`);
+const TOKENS = readJson(`${__dirname}/configs/tokens.json`);
+
+/**
+ * Create a new OAuth2 client with the configured keys.
+ */
+const oauth2Client = new google.auth.OAuth2(
+  CREDENTIALS.web.client_id,
+  CREDENTIALS.web.client_secret,
+  CREDENTIALS.web.redirect_uris[0]
+);
+
+/**
+ *  Set refresh token for permanent authorization
+ */
+ oauth2Client.setCredentials({
+  refresh_token: TOKENS.refresh_token
+});
+
+/**
+ * initialize the Youtube API library
+ */
+const youtube = google.youtube({
+  version: "v3",
+  auth: oauth2Client
+});
+
+/**
+ * Uploading a video to youtube
+ */
+async function uploadVideo(fileName) {
+  const fileSize = fs.statSync(fileName).size;
+  const res = await youtube.videos.insert(
+    {
+      part: "id,snippet,status",
+      notifySubscribers: false,
+      requestBody: {
+        snippet: {
+          title: "Node.js YouTube Upload Test",
+          description: "Testing YouTube upload via Google APIs Node.js Client"
+        },
+        status: {
+          privacyStatus: "private"
+        }
+      },
+      media: {
+        body: fs.createReadStream(fileName)
+      }
+    },
+    {
+      // Use the `onUploadProgress` event from Axios to track the
+      // number of bytes uploaded to this point.
+      onUploadProgress: evt => {
+        const progress = (evt.bytesRead / fileSize) * 100;
+        readline.clearLine();
+        readline.cursorTo(0);
+        process.stdout.write(`${Math.round(progress)}% complete`);
+      }
+    }
+  );
+  console.log("\n\n");
+  console.log(res.data);
+  return res.data;
+}
+
+// uploadVideo("./video_test.webm");
+
+
+// Handle request from clients
+app.post('/upload', upload.single('file'), function (req, res) {
+	uploadVideo(req.file.path);
+	return res.end();
 });

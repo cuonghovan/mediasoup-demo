@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import * as appPropTypes from './appPropTypes';
 import Peer from './Peer';
 import Me from './Me';
+import axios from 'axios';
 
 class Room extends React.Component 
 {
@@ -14,7 +15,10 @@ class Room extends React.Component
 			recording : false
 		};
 
+		this.multiStreamRecorder= null;
 		this.getDownloadlink = this.getDownloadlink.bind(this);
+		this.handleStartRecording = this.handleStartRecording.bind(this);
+		this.handleStopRecording = this.handleStopRecording.bind(this);
 	}
 
 	componentDidUpdate() 
@@ -27,8 +31,6 @@ class Room extends React.Component
 
 	getDownloadlink() 
 	{
-		console.log('props', this.props);
-
 		const { meMicProducer, meWebcamProducer,
 			peerMicConsumer, peerWebcamConsumer } = this.props;
 		const audioProducerTrack = meMicProducer ? meMicProducer.track : null;
@@ -57,18 +59,37 @@ class Room extends React.Component
 				consumerStream.addTrack(videoConsumerTrack);
 		}
 
-		const multiStreamRecorder = new MultiStreamRecorder([ producerStream, consumerStream ]);
+		this.multiStreamRecorder = new MultiStreamRecorder([ producerStream, consumerStream ]);
 		
-		multiStreamRecorder.ondataavailable = function(blob) 
+		this.multiStreamRecorder.ondataavailable = function(blob) 
 		{
+			console.log('blob', blob)
 			// POST/PUT "Blob" using FormData/XHR2
-			const blobURL = URL.createObjectURL(blob);
+			// const blobURL = URL.createObjectURL(blob);
 
-			document.write(`<a href='${blobURL}'>${blobURL}</a>`);
+			// document.write(`<a href='${blobURL}'>${blobURL}</a>`);
+
+			// Upload to server
+			var formData = new FormData();
+			formData.append('fname', 'ABCDEF.webm');
+			formData.append('file', blob);
+
+			axios.post('https://192.168.1.110:3443/upload', formData)
+				.then(res => console.log(res))
+				.catch(err => console.log(err));
 		};
-		
-		multiStreamRecorder.start(10000);
-		
+	}
+
+	handleStartRecording() 
+	{
+		console.log('start recording....');
+		this.multiStreamRecorder.start(99999999999);
+	}
+
+	handleStopRecording() 
+	{
+		console.log('stop recording....');
+		this.multiStreamRecorder.stop();
 	}
 
 	render() 
@@ -82,6 +103,8 @@ class Room extends React.Component
 					<Me micProducer={meMicProducer} webcamProducer={meWebcamProducer} />
 					{peer ? <Peer peer={peer} micConsumer={peerMicConsumer} webcamConsumer={peerWebcamConsumer} /> : null}
 				</div>
+				<button onClick={this.handleStartRecording}>Start recording</button>
+				<button onClick={this.handleStopRecording}>Stop recording</button>
 			</div>
 		);
 	}
