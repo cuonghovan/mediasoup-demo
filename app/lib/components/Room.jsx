@@ -4,6 +4,7 @@ import * as appPropTypes from './appPropTypes';
 import Peer from './Peer';
 import Me from './Me';
 import axios from 'axios';
+import { MultiStreamRecorder } from 'recordrtc';
 
 class Room extends React.Component 
 {
@@ -16,6 +17,7 @@ class Room extends React.Component
 		};
 
 		this.multiStreamRecorder= null;
+		this.streams = [];
 		this.getDownloadlink = this.getDownloadlink.bind(this);
 		this.handleStartRecording = this.handleStartRecording.bind(this);
 		this.handleStopRecording = this.handleStopRecording.bind(this);
@@ -59,15 +61,28 @@ class Room extends React.Component
 				consumerStream.addTrack(videoConsumerTrack);
 		}
 
-		this.multiStreamRecorder = new MultiStreamRecorder([ producerStream, consumerStream ]);
+		this.streams = [ producerStream, consumerStream ];
+	}
+
+	handleStartRecording() 
+	{
+		console.log('start recording....');
+
+		const options = {
+			mimeType: 'video/webm'
+		}
+
+		this.multiStreamRecorder = new MultiStreamRecorder(this.streams, options);
 		
-		this.multiStreamRecorder.ondataavailable = function(blob) 
+		this.multiStreamRecorder.record();
+	}
+
+	handleStopRecording() 
+	{
+		console.log('stop recording....');
+		this.multiStreamRecorder.stop(function(blob) 
 		{
 			console.log('blob', blob)
-			// POST/PUT "Blob" using FormData/XHR2
-			// const blobURL = URL.createObjectURL(blob);
-
-			// document.write(`<a href='${blobURL}'>${blobURL}</a>`);
 
 			// Upload to server
 			var formData = new FormData();
@@ -77,19 +92,7 @@ class Room extends React.Component
 			axios.post('https://192.168.1.110:3443/upload', formData)
 				.then(res => console.log(res))
 				.catch(err => console.log(err));
-		};
-	}
-
-	handleStartRecording() 
-	{
-		console.log('start recording....');
-		this.multiStreamRecorder.start(99999999999);
-	}
-
-	handleStopRecording() 
-	{
-		console.log('stop recording....');
-		this.multiStreamRecorder.stop();
+		});
 	}
 
 	render() 
